@@ -24,19 +24,19 @@ export async function generateFactCards(
   for (let i = 0; i < index.length; i++) {
     const pr = index[i];
 
-    if (factCardExists(pr.number)) {
+    if (factCardExists(pr.owner, pr.repo, pr.number)) {
       onProgress?.(i + 1, index.length, pr.number);
       continue;
     }
 
-    const detail = readPrDetail(pr.number);
+    const detail = readPrDetail(pr.owner, pr.repo, pr.number);
     if (!detail) {
       console.warn(`  Skipping PR #${pr.number}: no detail data found`);
       onProgress?.(i + 1, index.length, pr.number);
       continue;
     }
 
-    const diff = readPrDiff(pr.number);
+    const diff = readPrDiff(pr.owner, pr.repo, pr.number);
 
     const userPrompt = buildFactCardUserPrompt({
       prNumber: detail.number,
@@ -62,7 +62,7 @@ export async function generateFactCards(
     try {
       const parsed = JSON.parse(jsonStr);
       const card = FactCardSchema.parse(parsed);
-      writeFactCard(pr.number, card);
+      writeFactCard(pr.owner, pr.repo, pr.number, card);
       results.push(card);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);

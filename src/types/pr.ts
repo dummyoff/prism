@@ -1,4 +1,6 @@
 export interface PrIndex {
+  owner: string;
+  repo: string;
   number: number;
   title: string;
   url: string;

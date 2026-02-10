@@ -4,8 +4,7 @@ import type { SearchResponse } from "../github/types.js";
 import type { PrIndex } from "../types/pr.js";
 
 interface CollectIndexOptions {
-  owner: string;
-  repo: string;
+  repos: { owner: string; repo: string }[];
   author: string;
   state?: string;
   maxPages?: number;
@@ -15,45 +14,52 @@ export async function collectPrIndex(
   options: CollectIndexOptions,
   onProgress?: (count: number, total: number) => void,
 ): Promise<PrIndex[]> {
-  const { owner, repo, author, state = "merged", maxPages = 20 } = options;
+  const { repos, author, state = "merged", maxPages = 20 } = options;
 
-  const searchQuery = `repo:${owner}/${repo} type:pr author:${author} is:${state}`;
   const allEntries: PrIndex[] = [];
-  let cursor: string | null = null;
-  let page = 0;
+  let estimatedTotal = 0;
 
-  while (page < maxPages) {
-    const response: SearchResponse = await gql<SearchResponse>(PR_SEARCH_QUERY, {
-      searchQuery,
-      first: 50,
-      after: cursor,
-    });
+  for (const { owner, repo } of repos) {
+    const searchQuery = `repo:${owner}/${repo} type:pr author:${author} is:${state}`;
+    let cursor: string | null = null;
+    let page = 0;
 
-    const { nodes, pageInfo, issueCount } = response.search;
+    while (page < maxPages) {
+      const response: SearchResponse = await gql<SearchResponse>(PR_SEARCH_QUERY, {
+        searchQuery,
+        first: 50,
+        after: cursor,
+      });
 
-    for (const node of nodes) {
-      const entry: PrIndex = {
-        number: node.number,
-        title: node.title,
-        url: node.url,
-        state: node.state,
-        createdAt: node.createdAt,
-        mergedAt: node.mergedAt,
-        additions: node.additions,
-        deletions: node.deletions,
-        changedFiles: node.changedFiles,
-        baseRefName: node.baseRefName,
-        headRefName: node.headRefName,
-        labels: node.labels.nodes.map((l) => l.name),
-      };
-      allEntries.push(entry);
+      const { nodes, pageInfo, issueCount } = response.search;
+      estimatedTotal = Math.max(estimatedTotal, allEntries.length + issueCount);
+
+      for (const node of nodes) {
+        const entry: PrIndex = {
+          owner,
+          repo,
+          number: node.number,
+          title: node.title,
+          url: node.url,
+          state: node.state,
+          createdAt: node.createdAt,
+          mergedAt: node.mergedAt,
+          additions: node.additions,
+          deletions: node.deletions,
+          changedFiles: node.changedFiles,
+          baseRefName: node.baseRefName,
+          headRefName: node.headRefName,
+          labels: node.labels.nodes.map((l) => l.name),
+        };
+        allEntries.push(entry);
+      }
+
+      onProgress?.(allEntries.length, estimatedTotal);
+
+      if (!pageInfo.hasNextPage) break;
+      cursor = pageInfo.endCursor;
+      page++;
     }
-
-    onProgress?.(allEntries.length, issueCount);
-
-    if (!pageInfo.hasNextPage) break;
-    cursor = pageInfo.endCursor;
-    page++;
   }
 
   return allEntries;

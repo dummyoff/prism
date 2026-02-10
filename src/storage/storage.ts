@@ -42,80 +42,91 @@ export function writePrIndex(entries: PrIndex[]): void {
 
 // --- PR Detail (JSON) ---
 
-export function getPrDetailPath(prNumber: number): string {
-  return path.join(dataDir(), "pr_detail", `${prNumber}.json`);
+export function getPrDetailPath(owner: string, repo: string, prNumber: number): string {
+  return path.join(dataDir(), owner, repo, "pr_detail", `${prNumber}.json`);
 }
 
-export function writePrDetail(detail: PrDetail): void {
-  const filePath = getPrDetailPath(detail.number);
+export function writePrDetail(owner: string, repo: string, detail: PrDetail): void {
+  const filePath = getPrDetailPath(owner, repo, detail.number);
   ensureDir(path.dirname(filePath));
   fs.writeFileSync(filePath, JSON.stringify(detail, null, 2));
 }
 
-export function readPrDetail(prNumber: number): PrDetail | null {
-  const filePath = getPrDetailPath(prNumber);
+export function readPrDetail(owner: string, repo: string, prNumber: number): PrDetail | null {
+  const filePath = getPrDetailPath(owner, repo, prNumber);
   if (!fs.existsSync(filePath)) return null;
   return JSON.parse(fs.readFileSync(filePath, "utf-8")) as PrDetail;
 }
 
-export function prDetailExists(prNumber: number): boolean {
-  return fs.existsSync(getPrDetailPath(prNumber));
+export function prDetailExists(owner: string, repo: string, prNumber: number): boolean {
+  return fs.existsSync(getPrDetailPath(owner, repo, prNumber));
 }
 
 // --- PR Diff ---
 
-export function getPrDiffPath(prNumber: number): string {
-  return path.join(dataDir(), "pr_diff", `${prNumber}.diff`);
+export function getPrDiffPath(owner: string, repo: string, prNumber: number): string {
+  return path.join(dataDir(), owner, repo, "pr_diff", `${prNumber}.diff`);
 }
 
-export function writePrDiff(prNumber: number, diff: string): void {
-  const filePath = getPrDiffPath(prNumber);
+export function writePrDiff(owner: string, repo: string, prNumber: number, diff: string): void {
+  const filePath = getPrDiffPath(owner, repo, prNumber);
   ensureDir(path.dirname(filePath));
   fs.writeFileSync(filePath, diff);
 }
 
-export function readPrDiff(prNumber: number): string | null {
-  const filePath = getPrDiffPath(prNumber);
+export function readPrDiff(owner: string, repo: string, prNumber: number): string | null {
+  const filePath = getPrDiffPath(owner, repo, prNumber);
   if (!fs.existsSync(filePath)) return null;
   return fs.readFileSync(filePath, "utf-8");
 }
 
-export function prDiffExists(prNumber: number): boolean {
-  return fs.existsSync(getPrDiffPath(prNumber));
+export function prDiffExists(owner: string, repo: string, prNumber: number): boolean {
+  return fs.existsSync(getPrDiffPath(owner, repo, prNumber));
 }
 
 // --- Fact Cards (JSON) ---
 
-export function getFactCardPath(prNumber: number): string {
-  return path.join(dataDir(), "fact_cards", `${prNumber}.json`);
+export function getFactCardPath(owner: string, repo: string, prNumber: number): string {
+  return path.join(dataDir(), owner, repo, "fact_cards", `${prNumber}.json`);
 }
 
-export function writeFactCard(prNumber: number, card: unknown): void {
-  const filePath = getFactCardPath(prNumber);
+export function writeFactCard(owner: string, repo: string, prNumber: number, card: unknown): void {
+  const filePath = getFactCardPath(owner, repo, prNumber);
   ensureDir(path.dirname(filePath));
   fs.writeFileSync(filePath, JSON.stringify(card, null, 2));
 }
 
-export function readFactCard(prNumber: number): unknown | null {
-  const filePath = getFactCardPath(prNumber);
+export function readFactCard(owner: string, repo: string, prNumber: number): unknown | null {
+  const filePath = getFactCardPath(owner, repo, prNumber);
   if (!fs.existsSync(filePath)) return null;
   return JSON.parse(fs.readFileSync(filePath, "utf-8"));
 }
 
-export function factCardExists(prNumber: number): boolean {
-  return fs.existsSync(getFactCardPath(prNumber));
+export function factCardExists(owner: string, repo: string, prNumber: number): boolean {
+  return fs.existsSync(getFactCardPath(owner, repo, prNumber));
 }
 
 export function readAllFactCards(): { prNumber: number; card: unknown }[] {
-  const dir = path.join(dataDir(), "fact_cards");
-  if (!fs.existsSync(dir)) return [];
-  return fs
-    .readdirSync(dir)
-    .filter((f) => f.endsWith(".json"))
-    .map((f) => ({
-      prNumber: parseInt(path.basename(f, ".json"), 10),
-      card: JSON.parse(fs.readFileSync(path.join(dir, f), "utf-8")),
-    }));
+  const index = readPrIndex();
+  if (index.length === 0) return [];
+
+  const seen = new Set<string>();
+  const results: { prNumber: number; card: unknown }[] = [];
+
+  for (const entry of index) {
+    const key = `${entry.owner}/${entry.repo}/${entry.number}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+
+    const filePath = getFactCardPath(entry.owner, entry.repo, entry.number);
+    if (!fs.existsSync(filePath)) continue;
+    results.push({
+      prNumber: entry.number,
+      card: JSON.parse(fs.readFileSync(filePath, "utf-8")),
+    });
+  }
+
+  return results;
 }
 
 // --- Narratives (JSON) ---

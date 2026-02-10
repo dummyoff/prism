@@ -5,8 +5,6 @@ import type { PrDetail, PrComment } from "../types/pr.js";
 import { readPrIndex, writePrDetail, prDetailExists } from "../storage/storage.js";
 
 export async function collectPrDetails(
-  owner: string,
-  repo: string,
   onProgress?: (current: number, total: number, prNumber: number) => void,
 ): Promise<PrDetail[]> {
   const index = readPrIndex();
@@ -19,14 +17,14 @@ export async function collectPrDetails(
   for (let i = 0; i < index.length; i++) {
     const pr = index[i];
 
-    if (prDetailExists(pr.number)) {
+    if (prDetailExists(pr.owner, pr.repo, pr.number)) {
       onProgress?.(i + 1, index.length, pr.number);
       continue;
     }
 
     const response = await gql<PullRequestDetailResponse>(PR_DETAIL_QUERY, {
-      owner,
-      repo,
+      owner: pr.owner,
+      repo: pr.repo,
       number: pr.number,
     });
 
@@ -85,7 +83,7 @@ export async function collectPrDetails(
       ],
     };
 
-    writePrDetail(detail);
+    writePrDetail(pr.owner, pr.repo, detail);
     results.push(detail);
     onProgress?.(i + 1, index.length, pr.number);
   }
