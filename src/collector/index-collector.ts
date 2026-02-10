@@ -2,7 +2,6 @@ import { gql } from "../github/graphql-client.js";
 import { PR_SEARCH_QUERY } from "../github/queries.js";
 import type { SearchResponse } from "../github/types.js";
 import type { PrIndex } from "../types/pr.js";
-import { writePrIndex } from "../storage/storage.js";
 
 interface CollectIndexOptions {
   owner: string;
@@ -57,6 +56,5 @@ export async function collectPrIndex(
     page++;
   }
 
-  writePrIndex(allEntries);
   return allEntries;
 }

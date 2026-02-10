@@ -3,6 +3,7 @@
 import { Command } from "commander";
 import ora from "ora";
 import chalk from "chalk";
+import { confirm, checkbox } from "@inquirer/prompts";
 import { getConfig } from "./config.js";
 import { collectPrIndex } from "./collector/index-collector.js";
 import { collectPrDetails } from "./collector/detail-collector.js";
@@ -11,7 +12,9 @@ import { generateFactCards } from "./llm/fact-generator.js";
 import { generateNarratives } from "./llm/narrative-generator.js";
 import { AnthropicProvider } from "./llm/anthropic.js";
 import { OpenAIProvider } from "./llm/openai.js";
+import { writePrIndex } from "./storage/storage.js";
 import type { LlmProvider } from "./llm/provider.js";
+import type { PrIndex } from "./types/pr.js";
 
 function createLlmProvider(): LlmProvider {
   const config = getConfig();
@@ -25,6 +28,32 @@ function createLlmProvider(): LlmProvider {
     apiKey: config.OPENAI_API_KEY!,
     model: config.LLM_MODEL,
   });
+}
+
+async function selectPrs(entries: PrIndex[]): Promise<PrIndex[]> {
+  const useAll = await confirm({
+    message: `전체 ${entries.length}개 PR을 사용할까요?`,
+    default: true,
+  });
+
+  if (useAll) return entries;
+
+  const selected = await checkbox({
+    message: "사용할 PR을 선택하세요:",
+    choices: entries.map((entry) => ({
+      name: `#${entry.number} ${entry.title}`,
+      value: entry.number,
+      checked: true,
+    })),
+  });
+
+  if (selected.length === 0) {
+    console.log(chalk.yellow("선택된 PR이 없습니다. 종료합니다."));
+    process.exit(0);
+  }
+
+  const selectedSet = new Set(selected);
+  return entries.filter((e) => selectedSet.has(e.number));
 }
 
 const program = new Command();
@@ -56,7 +85,11 @@ program
           spinner.text = `Collecting PR index... ${count}/${total}`;
         },
       );
-      spinner.succeed(chalk.green(`Collected ${entries.length} PRs → pr_index.jsonl`));
+      spinner.succeed(chalk.green(`Collected ${entries.length} PRs`));
+
+      const selected = await selectPrs(entries);
+      writePrIndex(selected);
+      console.log(chalk.green(`Saved ${selected.length}/${entries.length} PRs → pr_index.jsonl`));
     } catch (error) {
       spinner.fail(chalk.red(error instanceof Error ? error.message : String(error)));
       process.exit(1);
@@ -170,6 +203,10 @@ program
         },
       );
       spinner.succeed(`Step 1/5: Collected ${entries.length} PRs`);
+
+      const selected = await selectPrs(entries);
+      writePrIndex(selected);
+      console.log(chalk.green(`  → Saved ${selected.length}/${entries.length} PRs`));
     } catch (error) {
       spinner.fail(chalk.red(error instanceof Error ? error.message : String(error)));
       process.exit(1);
