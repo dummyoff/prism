@@ -105,13 +105,14 @@ program
 program
   .command("generate-facts")
   .description("Generate FACT cards from PR data using LLM")
-  .action(async () => {
+  .option("--lang <language>", "Output language (e.g., Korean, Japanese, English)")
+  .action(async (opts) => {
     const spinner = ora("Generating FACT cards...").start();
     try {
       const provider = createLlmProvider();
       const cards = await generateFactCards(provider, (current, total, prNumber) => {
         spinner.text = `Generating FACT cards... ${current}/${total} (PR #${prNumber})`;
-      });
+      }, opts.lang);
       spinner.succeed(chalk.green(`Generated ${cards.length} FACT cards → fact_cards/`));
     } catch (error) {
       spinner.fail(chalk.red(error instanceof Error ? error.message : String(error)));
@@ -123,13 +124,14 @@ program
 program
   .command("generate-narratives")
   .description("Generate STAR/CARE narratives from FACT cards")
-  .action(async () => {
+  .option("--lang <language>", "Output language (e.g., Korean, Japanese, English)")
+  .action(async (opts) => {
     const spinner = ora("Generating narratives...").start();
     try {
       const provider = createLlmProvider();
       const { star, care } = await generateNarratives(provider, (step, current, total) => {
         spinner.text = `Generating narratives [${step}]... ${current}/${total}`;
-      });
+      }, opts.lang);
       spinner.succeed(
         chalk.green(
           `Generated ${star.narratives.length} STAR + ${care.narratives.length} CARE narratives → narratives/`,
@@ -149,6 +151,7 @@ program
   .requiredOption("--repo <repo>", "Repository name")
   .requiredOption("--author <author>", "PR author username")
   .option("--state <state>", "PR state filter", "merged")
+  .option("--lang <language>", "Output language (e.g., Korean, Japanese, English)")
   .action(async (opts) => {
     console.log(chalk.bold("\n🔍 PRISM — Full Pipeline\n"));
 
@@ -202,7 +205,7 @@ program
       const provider = createLlmProvider();
       const cards = await generateFactCards(provider, (current, total, prNumber) => {
         spinner.text = `Step 4/5: Generating FACT cards... ${current}/${total} (PR #${prNumber})`;
-      });
+      }, opts.lang);
       spinner.succeed(`Step 4/5: Generated ${cards.length} FACT cards`);
     } catch (error) {
       spinner.fail(chalk.red(error instanceof Error ? error.message : String(error)));
@@ -215,7 +218,7 @@ program
       const provider = createLlmProvider();
       const { star, care } = await generateNarratives(provider, (step, current, total) => {
         spinner.text = `Step 5/5: Generating narratives [${step}]... ${current}/${total}`;
-      });
+      }, opts.lang);
       spinner.succeed(
         `Step 5/5: Generated ${star.narratives.length} STAR + ${care.narratives.length} CARE narratives`,
       );

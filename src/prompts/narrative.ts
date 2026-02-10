@@ -1,6 +1,9 @@
 import type { FactCard } from "../types/fact-card.js";
 
-export const CLUSTER_SYSTEM_PROMPT = `You are a portfolio strategist. Given a list of FACT cards (structured summaries of GitHub Pull Requests), group them into 3-7 thematic clusters that would make compelling portfolio narratives.
+export function buildClusterSystemPrompt(lang?: string): string {
+  const langInstruction = lang ? `\n\nIMPORTANT: Write all text values (theme, rationale) in ${lang}.` : "";
+
+  return `You are a portfolio strategist. Given a list of FACT cards (structured summaries of GitHub Pull Requests), group them into 3-7 thematic clusters that would make compelling portfolio narratives.${langInstruction}
 
 Each cluster should have:
 - A clear theme (e.g., "Performance Optimization", "API Design & Integration", "Developer Experience")
@@ -20,6 +23,7 @@ Guidelines:
 - A PR can appear in multiple clusters if relevant
 - Prioritize clusters that show depth, progression, or impact
 - Avoid clusters with only 1 PR unless it's highly significant`;
+}
 
 export function buildClusterUserPrompt(cards: FactCard[]): string {
   const summaries = cards
@@ -32,7 +36,9 @@ export function buildClusterUserPrompt(cards: FactCard[]): string {
   return `Here are ${cards.length} FACT cards:\n\n${summaries}\n\nGroup these into thematic clusters.`;
 }
 
-export function buildStarNarrativeSystemPrompt(): string {
+export function buildStarNarrativeSystemPrompt(lang?: string): string {
+  const langInstruction = lang ? `\n- Write ALL text values in ${lang}` : "";
+
   return `You are a technical portfolio writer. Given a cluster of FACT cards, write a STAR narrative (Situation, Task, Action, Result) that weaves them into a compelling portfolio story.
 
 Output ONLY valid JSON:
@@ -50,10 +56,12 @@ Guidelines:
 - Be specific about technologies and technical decisions
 - Quantify impact where data is available
 - Show engineering judgment, not just task completion
-- The narrative should read naturally as a portfolio bullet or interview answer`;
+- The narrative should read naturally as a portfolio bullet or interview answer${langInstruction}`;
 }
 
-export function buildCareNarrativeSystemPrompt(): string {
+export function buildCareNarrativeSystemPrompt(lang?: string): string {
+  const langInstruction = lang ? `\n- Write ALL text values in ${lang}` : "";
+
   return `You are a technical portfolio writer. Given a cluster of FACT cards, write a CARE narrative (Context, Action, Result, Evolution) that weaves them into a compelling portfolio story.
 
 Output ONLY valid JSON:
@@ -71,7 +79,7 @@ Guidelines:
 - Be specific about technologies and technical decisions
 - Quantify impact where data is available
 - "Evolution" should show growth mindset or long-term thinking
-- The narrative should read naturally as a portfolio entry`;
+- The narrative should read naturally as a portfolio entry${langInstruction}`;
 }
 
 export function buildNarrativeUserPrompt(

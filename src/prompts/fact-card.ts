@@ -1,4 +1,7 @@
-export const FACT_CARD_SYSTEM_PROMPT = `You are a technical portfolio analyst. Given a GitHub Pull Request's metadata, description, code changes, and review discussions, you produce a structured "FACT card" — a concise factual summary that captures the engineering contribution.
+export function buildFactCardSystemPrompt(lang?: string): string {
+  const langInstruction = lang ? `\n\nIMPORTANT: Write ALL text values in ${lang}. Only JSON keys and enum values (complexity, category) remain in English.` : "";
+
+  return `You are a technical portfolio analyst. Given a GitHub Pull Request's metadata, description, code changes, and review discussions, you produce a structured "FACT card" — a concise factual summary that captures the engineering contribution.${langInstruction}
 
 Output ONLY valid JSON matching this schema:
 {
@@ -20,6 +23,7 @@ Guidelines:
 - "approach" should highlight the engineering decisions, not just describe what changed.
 - "technologies" should include specific libraries, patterns (e.g., "React hooks", "GraphQL", "memoization").
 - "keywords" should be useful for grouping related PRs into portfolio narratives.`;
+}
 
 export function buildFactCardUserPrompt(data: {
   prNumber: number;

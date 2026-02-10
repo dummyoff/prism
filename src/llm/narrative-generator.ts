@@ -8,7 +8,7 @@ import {
   type NarrativeOutput,
 } from "../types/narrative.js";
 import {
-  CLUSTER_SYSTEM_PROMPT,
+  buildClusterSystemPrompt,
   buildClusterUserPrompt,
   buildStarNarrativeSystemPrompt,
   buildCareNarrativeSystemPrompt,
@@ -27,9 +27,9 @@ function parseJson<T>(raw: string): T {
   return JSON.parse(jsonStr) as T;
 }
 
-async function clusterFactCards(provider: LlmProvider, cards: FactCard[]): Promise<Cluster[]> {
+async function clusterFactCards(provider: LlmProvider, cards: FactCard[], lang?: string): Promise<Cluster[]> {
   const raw = await provider.generate([
-    { role: "system", content: CLUSTER_SYSTEM_PROMPT },
+    { role: "system", content: buildClusterSystemPrompt(lang) },
     { role: "user", content: buildClusterUserPrompt(cards) },
   ]);
   return parseJson<Cluster[]>(raw);
@@ -38,6 +38,7 @@ async function clusterFactCards(provider: LlmProvider, cards: FactCard[]): Promi
 export async function generateNarratives(
   provider: LlmProvider,
   onProgress?: (step: string, current: number, total: number) => void,
+  lang?: string,
 ): Promise<{ star: NarrativeOutput; care: NarrativeOutput }> {
   const allCards = readAllFactCards();
   if (allCards.length === 0) {
@@ -48,7 +49,7 @@ export async function generateNarratives(
 
   // Step 1: Cluster
   onProgress?.("clustering", 0, 1);
-  const clusters = await clusterFactCards(provider, cards);
+  const clusters = await clusterFactCards(provider, cards, lang);
   onProgress?.("clustering", 1, 1);
 
   // Step 2: Generate STAR narratives
@@ -56,7 +57,7 @@ export async function generateNarratives(
   for (let i = 0; i < clusters.length; i++) {
     onProgress?.("star", i + 1, clusters.length);
     const raw = await provider.generate([
-      { role: "system", content: buildStarNarrativeSystemPrompt() },
+      { role: "system", content: buildStarNarrativeSystemPrompt(lang) },
       { role: "user", content: buildNarrativeUserPrompt(clusters[i], cards) },
     ]);
     try {
@@ -73,7 +74,7 @@ export async function generateNarratives(
   for (let i = 0; i < clusters.length; i++) {
     onProgress?.("care", i + 1, clusters.length);
     const raw = await provider.generate([
-      { role: "system", content: buildCareNarrativeSystemPrompt() },
+      { role: "system", content: buildCareNarrativeSystemPrompt(lang) },
       { role: "user", content: buildNarrativeUserPrompt(clusters[i], cards) },
     ]);
     try {

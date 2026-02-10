@@ -65,21 +65,22 @@ pnpm prism collect-detail --owner <owner> --repo <repo>
 pnpm prism collect-diff --owner <owner> --repo <repo>
 
 # 4. Generate FACT cards
-pnpm prism generate-facts
+pnpm prism generate-facts --lang Korean
 
 # 5. Generate STAR/CARE narratives
-pnpm prism generate-narratives
+pnpm prism generate-narratives --lang Korean
 ```
 
 ### Full Pipeline
 
 ```bash
-pnpm prism run-all --owner <owner> --repo <repo> --author <username>
+pnpm prism run-all --owner <owner> --repo <repo> --author <username> --lang Korean
 ```
 
 ### Options
 
 - `--state <state>` — PR state filter: `merged`, `open`, `closed` (default: `merged`)
+- `--lang <language>` — Output language for FACT cards and narratives (e.g., `Korean`, `Japanese`, `English`). Omit for English.
 
 ## Output Structure
 

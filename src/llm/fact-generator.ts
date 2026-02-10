@@ -1,6 +1,6 @@
 import type { LlmProvider } from "./provider.js";
 import { FactCardSchema, type FactCard } from "../types/fact-card.js";
-import { FACT_CARD_SYSTEM_PROMPT, buildFactCardUserPrompt } from "../prompts/fact-card.js";
+import { buildFactCardSystemPrompt, buildFactCardUserPrompt } from "../prompts/fact-card.js";
 import {
   readPrIndex,
   readPrDetail,
@@ -12,6 +12,7 @@ import {
 export async function generateFactCards(
   provider: LlmProvider,
   onProgress?: (current: number, total: number, prNumber: number) => void,
+  lang?: string,
 ): Promise<FactCard[]> {
   const index = readPrIndex();
   if (index.length === 0) {
@@ -51,7 +52,7 @@ export async function generateFactCards(
     });
 
     const raw = await provider.generate([
-      { role: "system", content: FACT_CARD_SYSTEM_PROMPT },
+      { role: "system", content: buildFactCardSystemPrompt(lang) },
       { role: "user", content: userPrompt },
     ]);
 
